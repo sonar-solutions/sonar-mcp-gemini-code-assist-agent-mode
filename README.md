@@ -7,6 +7,8 @@
 * Implement a GEMINI.md file to instruct the agent to run quality gate checks and fix issues before marking any task complete.  
 * This workflow has the AI agent run the SonarScanner CLI, fix coverage gaps and code quality issues, and verify a clean quality gate, all without leaving the IDE.
 
+## Overview
+
 With Gemini Code Assist, agent mode can write code, run commands, and iterate on tasks with minimal intervention. What it can't do on its own is verify that the code it produces is [high quality](https://www.sonarsource.com/solutions/ai-code-quality/), [maintainable](https://www.sonarsource.com/solutions/maintainability/), and [secure](https://www.sonarsource.com/solutions/security/). The [SonarQube MCP Server](https://www.sonarsource.com/products/sonarqube/mcp-server/) fills that gap, connecting Gemini's agent to [SonarQube Cloud](https://www.sonarsource.com/products/sonarqube/cloud/) so it can scan its own code, read the results, and fix code quality and security issues before you ever review the output. This guide walks through the setup and details a real workflow: Gemini generates code, SonarQube analyzes it, and the agent steps in to resolve any issues that were discovered.
 
 ## When to use this
@@ -25,8 +27,8 @@ By the end of this guide, you'll have:
 
 This guide uses a [Python](https://www.sonarsource.com/knowledge/languages/python/) project as an example. SonarQube Cloud supports analysis across [40+ programming languages](https://www.sonarsource.com/knowledge/languages/), so this workflow applies regardless of your project's tech stack.
 
-![Architecture diagram](screenshots/mcp-inner-loop.png)
-
+<img width="2102" height="610" alt="image" src="https://github.com/user-attachments/assets/161b5643-f05b-4639-af52-fd390fd1b078" />
+<br>
 The Gemini Code Assist agent runs the [SonarScanner CLI](https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/scanners/sonarscanner-cli), which analyzes the code locally and sends the results to SonarQube Cloud for processing. Once the analysis completes, the native MCP server embedded in SonarQube Cloud returns the findings—quality gate status, issues, and rule details—directly to the agent. The agent reads the results and fixes what it finds, closing the loop without leaving VS Code.
 
 ## Prerequisites
@@ -36,7 +38,7 @@ The Gemini Code Assist agent runs the [SonarScanner CLI](https://docs.sonarsourc
 - **Gemini Code Assist extension:** installed in VS Code and authenticated with a Google account, with agent mode enabled. See: [Gemini Code Assist docs](https://developers.google.com/gemini-code-assist/docs/use-agentic-chat-pair-programmer).  
 - **MCP connection:** verified by toggling agent mode in the Gemini panel and entering `/mcp`. You should see `sonarqube` listed alongside its available tools:
 
-### Step 1 — Project configuration
+## Step 1 — Project configuration
 
 Create a `sonar-project.properties` file in your project root and replace `YOUR_PROJECT_KEY` and `YOUR_ORG_KEY` with the values from your SonarQube Cloud project:
 
@@ -57,7 +59,7 @@ The scanner authenticates with SonarQube Cloud using a `SONAR_TOKEN` environment
 
 If you've set `SONAR_TOKEN` in your shell profile or a `.env` file, skip this step. The `sonar-scanner` binary reads the variable automatically when it runs.
 
-### Step 2 — Behavior enforcement with GEMINI.md
+## Step 2 — Behavior enforcement with GEMINI.md
 
 Create a `GEMINI.md` file at the project root. Gemini reads this file automatically at the start of every agent session, and it acts as the rulebook for how the agent generates and modifies code in this project:
 
@@ -88,7 +90,7 @@ This project uses SonarQube Cloud for code quality and security verification.
 
 The "Project details" section is worth including as naming specific MCP tools provides the agent with concrete actions rather than vague instructions.
 
-### Step 3 — Generate code with agent mode
+## Step 3 — Generate code with agent mode
 
 Open the project directory in VS Code and toggle agent mode in the Gemini panel. Enter this prompt:
 
@@ -102,7 +104,7 @@ Include a requirements.txt and test directory.
 
 Gemini creates the project files: an `app.py` with Flask routes and SQLite queries, a `requirements.txt` with the dependencies, and a `test_app.py` script. Following the rules laid out in `GEMINI.md`, the agent moves straight into verification rather than halting after code generation.
 
-### Step 4 — Verify the project target and run the first scan
+## Step 4 — Verify the project target and run the first scan
 
 Before scanning, the agent confirms it's targeting the right SonarQube Cloud project. It calls `search_my_sonarqube_projects` through the MCP Server to list your projects and match the project key in `sonar-project.properties`.
 
@@ -118,7 +120,7 @@ Next, the agent calls `get_project_quality_gate_status` to read the result. The 
 
 In this case, the primary blocker is **insufficient test coverage** as the quality gate requires a minimum coverage threshold on new code. The agent identifies this, then reads `app.py` and `tests/test_app.py` to understand what needs to be covered.
 
-### Step 5 — Fix, re-scan, and verify
+## Step 5 — Fix, re-scan, and verify
 
 The agent examines the application code and writes unit tests to raise coverage above the quality gate threshold. In our example, it uses `pytest` and Flask's test client to cover the POST and GET endpoints, including edge cases like missing fields and empty database responses.
 
