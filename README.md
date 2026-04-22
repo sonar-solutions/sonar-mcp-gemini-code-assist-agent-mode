@@ -29,7 +29,7 @@ This guide uses a [Python](https://www.sonarsource.com/knowledge/languages/pytho
 
 <img width="2102" height="610" alt="image" src="https://github.com/user-attachments/assets/161b5643-f05b-4639-af52-fd390fd1b078" />
 <br>
-The Gemini Code Assist agent runs the [SonarScanner CLI](https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/scanners/sonarscanner-cli), which analyzes the code locally and sends the results to SonarQube Cloud for processing. Once the analysis completes, the native MCP server embedded in SonarQube Cloud returns the findings—quality gate status, issues, and rule details—directly to the agent. The agent reads the results and fixes what it finds, closing the loop without leaving VS Code.
+The Gemini Code Assist agent runs the SonarScanner CLI, which analyzes the code locally and sends the results to SonarQube Cloud for processing. Once the analysis completes, the native MCP server embedded in SonarQube Cloud returns the findings—quality gate status, issues, and rule details—directly to the agent. The agent reads the results and fixes what it finds, closing the loop without leaving VS Code.
 
 ## Prerequisites
 
