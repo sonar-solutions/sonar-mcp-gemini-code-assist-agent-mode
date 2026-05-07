@@ -1,5 +1,7 @@
 # Get started with SonarQube MCP Server and Gemini Code Assist agent mode
 
+> Last verified: April 2026
+
 ## TL;DR overview
 
 * Integrate SonarQube MCP Server with Gemini Code Assist agent mode to automatically verify AI-generated code quality, maintainability, and security.  
